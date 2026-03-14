@@ -119,12 +119,33 @@ async function buildMergedAreaIfExists() {
   console.log('skip: merged area source not found');
 }
 
+async function copyCsvAssets() {
+  const csvFiles = [
+    'Xuhui_houseprice_grid_metrics.csv',
+    'Xuhui_streetview_grid_metrics.csv',
+    'Xuhui_activity_grid.csv',
+    'Xuhui_Road_Network_Data_Fixed.csv',
+  ];
+
+  for (const fileName of csvFiles) {
+    const src = path.join(rootDir, fileName);
+    const dest = path.join(rootDir, 'public', fileName);
+    if (!fs.existsSync(src)) {
+      console.log(`skip: ${fileName} source not found`);
+      continue;
+    }
+    await fs.promises.copyFile(src, dest);
+    console.log(`copied: ${path.relative(rootDir, dest)}`);
+  }
+}
+
 async function main() {
   await ensureDir(outputDir);
   await buildBoundary();
   await buildPoiDiversity();
   await buildRoads();
   await buildMergedAreaIfExists();
+  await copyCsvAssets();
 }
 
 main().catch((error) => {
